@@ -1,5 +1,3 @@
-version: "3.8"
-
 networks:
   region-a-net:
     name: region-a-net
@@ -24,24 +22,9 @@ services:
       - region-a-net
     depends_on:
       - consul-a
-    environment:
-      PATRONI_SCOPE: region-a-cluster
-      PATRONI_NAME: patroni-a1
-      PATRONI_CONSUL_HOST: consul-a:8500
-      PATRONI_RESTAPI_LISTEN: 0.0.0.0:8008
-      PATRONI_RESTAPI_CONNECT_ADDRESS: patroni-a1:8008
-      PATRONI_POSTGRESQL_LISTEN: 0.0.0.0:5432
-      PATRONI_POSTGRESQL_CONNECT_ADDRESS: patroni-a1:5432
-      PATRONI_POSTGRESQL_DATA_DIR: /data/patroni
-      PATRONI_SUPERUSER_USERNAME: postgres
-      PATRONI_SUPERUSER_PASSWORD: postgres
-      PATRONI_REPLICATION_USERNAME: replicator
-      PATRONI_REPLICATION_PASSWORD: replpass
-      PATRONI_POSTGRESQL_PARAMETERS_WAL_LEVEL: logical
-      PATRONI_POSTGRESQL_PARAMETERS_MAX_REPLICATION_SLOTS: 10
-      PATRONI_POSTGRESQL_PARAMETERS_MAX_WAL_SENDERS: 10
     volumes:
       - patroni_a1_data:/data/patroni
+      - ./patroni-a1.yml:/patroni.yml:ro
     ports:
       - "5501:5432"
       - "8008:8008"
@@ -55,24 +38,9 @@ services:
       - region-a-net
     depends_on:
       - consul-a
-    environment:
-      PATRONI_SCOPE: region-a-cluster
-      PATRONI_NAME: patroni-a2
-      PATRONI_CONSUL_HOST: consul-a:8500
-      PATRONI_RESTAPI_LISTEN: 0.0.0.0:8008
-      PATRONI_RESTAPI_CONNECT_ADDRESS: patroni-a2:8008
-      PATRONI_POSTGRESQL_LISTEN: 0.0.0.0:5432
-      PATRONI_POSTGRESQL_CONNECT_ADDRESS: patroni-a2:5432
-      PATRONI_POSTGRESQL_DATA_DIR: /data/patroni
-      PATRONI_SUPERUSER_USERNAME: postgres
-      PATRONI_SUPERUSER_PASSWORD: postgres
-      PATRONI_REPLICATION_USERNAME: replicator
-      PATRONI_REPLICATION_PASSWORD: replpass
-      PATRONI_POSTGRESQL_PARAMETERS_WAL_LEVEL: logical
-      PATRONI_POSTGRESQL_PARAMETERS_MAX_REPLICATION_SLOTS: 10
-      PATRONI_POSTGRESQL_PARAMETERS_MAX_WAL_SENDERS: 10
     volumes:
       - patroni_a2_data:/data/patroni
+      - ./patroni-a2.yml:/patroni.yml:ro
     ports:
       - "5502:5432"
       - "8009:8008"
