@@ -1,0 +1,15 @@
+networks:
+  dr-net:
+    external: true
+
+services:
+  haproxy:
+    image: haproxy:2.9
+    container_name: haproxy-dr
+    networks:
+      - dr-net
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - "6432:6432"
+      - "7000:7000"
