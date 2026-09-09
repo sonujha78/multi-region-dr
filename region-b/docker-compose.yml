@@ -6,7 +6,19 @@ services:
   consul-b:
     image: hashicorp/consul:1.19
     container_name: consul-b
-    command: agent -dev -client=0.0.0.0 -ui
+    hostname: consul-b
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        MY_IP=$$(hostname -i)
+        exec consul agent -dev \
+          -client=0.0.0.0 \
+          -ui \
+          -datacenter=dc-b \
+          -node=consul-b \
+          -advertise-wan=$$MY_IP \
+          -serf-wan-bind=$$MY_IP \
+          -retry-join-wan=consul-a
     networks:
       - dr-net
     ports:
