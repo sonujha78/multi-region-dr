@@ -1,0 +1,50 @@
+networks:
+  region-b-net:
+    name: region-b-net
+    driver: bridge
+
+services:
+  consul-b:
+    image: hashicorp/consul:1.19
+    container_name: consul-b
+    command: agent -dev -client=0.0.0.0 -ui
+    networks:
+      - region-b-net
+    ports:
+      - "8501:8500"
+
+  patroni-b1:
+    build:
+      context: ../docker/patroni
+    container_name: patroni-b1
+    hostname: patroni-b1
+    networks:
+      - region-b-net
+    depends_on:
+      - consul-b
+    volumes:
+      - patroni_b1_data:/data/patroni
+      - ./patroni-b1.yml:/patroni.yml:ro
+    ports:
+      - "5601:5432"
+      - "8018:8008"
+
+  patroni-b2:
+    build:
+      context: ../docker/patroni
+    container_name: patroni-b2
+    hostname: patroni-b2
+    networks:
+      - region-b-net
+    depends_on:
+      - consul-b
+    volumes:
+      - patroni_b2_data:/data/patroni
+      - ./patroni-b2.yml:/patroni.yml:ro
+    ports:
+      - "5602:5432"
+      - "8019:8008"
+
+volumes:
+  patroni_b1_data:
+  patroni_b2_data:
