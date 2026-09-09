@@ -84,3 +84,33 @@ multi-region deployment.
 **Follow-up for anyone hitting this on a different Docker/kernel version:** try upgrading/
 downgrading Docker Engine, or check `journalctl -u docker` around the time of network
 creation for iptables errors that might not surface in normal output.
+
+---
+
+## Issue 4: Logical replication breaks silently after intra-region Patroni failover
+
+**Symptom:** `CREATE SUBSCRIPTION` / an existing subscription's `pg_stat_replication`
+shows `state=startup` indefinitely, or a `CREATE SUBSCRIPTION` call hangs for
+minutes with the backend stuck in `wait_event=LibPQWalReceiverReceive`.
+
+**Root cause:** The subscription's `CONNECTION` string was hardcoded to a specific
+node hostname (e.g. `host=patroni-a1`). After repeated container stop/start cycles
+during failover testing, Patroni performed an internal (intra-region) leader
+election and `patroni-a2` became the new leader while `patroni-a1` became a
+replica. A replica does not accept logical replication connections for a
+publication defined on the (now different) primary, so the subscription's WAL
+receiver connects to a node that can no longer serve it and hangs waiting for
+data that will never arrive.
+
+**Fix (immediate):** `pg_terminate_backend()` the stuck backend PID on the
+publisher side (found via `pg_stat_activity`, `wait_event=LibPQWalReceiverReceive`,
+long `now()-query_start`), then `ALTER SUBSCRIPTION ... CONNECTION '...'` to point
+at the current leader.
+
+**Real-world fix:** In production this must never be a hardcoded hostname.
+The subscription's `CONNECTION` string should point at a stable endpoint that
+always resolves to the current Patroni leader — e.g. a VIP managed by Patroni's
+`callbacks`, or (as this project already has) the HAProxy `/leader`-health-checked
+listener. This project's HAProxy `postgres_write` listener on `:6432` is exactly
+this kind of stable endpoint, and production subscriptions should connect through
+it rather than to any individual patroni-* container.
