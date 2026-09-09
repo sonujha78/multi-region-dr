@@ -1,0 +1,82 @@
+version: "3.8"
+
+networks:
+  region-a-net:
+    name: region-a-net
+    driver: bridge
+
+services:
+  consul-a:
+    image: hashicorp/consul:1.19
+    container_name: consul-a
+    command: agent -dev -client=0.0.0.0 -ui
+    networks:
+      - region-a-net
+    ports:
+      - "8500:8500"
+
+  patroni-a1:
+    build:
+      context: ../docker/patroni
+    container_name: patroni-a1
+    hostname: patroni-a1
+    networks:
+      - region-a-net
+    depends_on:
+      - consul-a
+    environment:
+      PATRONI_SCOPE: region-a-cluster
+      PATRONI_NAME: patroni-a1
+      PATRONI_CONSUL_HOST: consul-a:8500
+      PATRONI_RESTAPI_LISTEN: 0.0.0.0:8008
+      PATRONI_RESTAPI_CONNECT_ADDRESS: patroni-a1:8008
+      PATRONI_POSTGRESQL_LISTEN: 0.0.0.0:5432
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: patroni-a1:5432
+      PATRONI_POSTGRESQL_DATA_DIR: /data/patroni
+      PATRONI_SUPERUSER_USERNAME: postgres
+      PATRONI_SUPERUSER_PASSWORD: postgres
+      PATRONI_REPLICATION_USERNAME: replicator
+      PATRONI_REPLICATION_PASSWORD: replpass
+      PATRONI_POSTGRESQL_PARAMETERS_WAL_LEVEL: logical
+      PATRONI_POSTGRESQL_PARAMETERS_MAX_REPLICATION_SLOTS: 10
+      PATRONI_POSTGRESQL_PARAMETERS_MAX_WAL_SENDERS: 10
+    volumes:
+      - patroni_a1_data:/data/patroni
+    ports:
+      - "5501:5432"
+      - "8008:8008"
+
+  patroni-a2:
+    build:
+      context: ../docker/patroni
+    container_name: patroni-a2
+    hostname: patroni-a2
+    networks:
+      - region-a-net
+    depends_on:
+      - consul-a
+    environment:
+      PATRONI_SCOPE: region-a-cluster
+      PATRONI_NAME: patroni-a2
+      PATRONI_CONSUL_HOST: consul-a:8500
+      PATRONI_RESTAPI_LISTEN: 0.0.0.0:8008
+      PATRONI_RESTAPI_CONNECT_ADDRESS: patroni-a2:8008
+      PATRONI_POSTGRESQL_LISTEN: 0.0.0.0:5432
+      PATRONI_POSTGRESQL_CONNECT_ADDRESS: patroni-a2:5432
+      PATRONI_POSTGRESQL_DATA_DIR: /data/patroni
+      PATRONI_SUPERUSER_USERNAME: postgres
+      PATRONI_SUPERUSER_PASSWORD: postgres
+      PATRONI_REPLICATION_USERNAME: replicator
+      PATRONI_REPLICATION_PASSWORD: replpass
+      PATRONI_POSTGRESQL_PARAMETERS_WAL_LEVEL: logical
+      PATRONI_POSTGRESQL_PARAMETERS_MAX_REPLICATION_SLOTS: 10
+      PATRONI_POSTGRESQL_PARAMETERS_MAX_WAL_SENDERS: 10
+    volumes:
+      - patroni_a2_data:/data/patroni
+    ports:
+      - "5502:5432"
+      - "8009:8008"
+
+volumes:
+  patroni_a1_data:
+  patroni_a2_data:
