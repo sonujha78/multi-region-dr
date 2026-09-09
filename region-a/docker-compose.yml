@@ -1,7 +1,6 @@
 networks:
-  region-a-net:
-    name: region-a-net
-    driver: bridge
+  dr-net:
+    external: true
 
 services:
   consul-a:
@@ -9,7 +8,7 @@ services:
     container_name: consul-a
     command: agent -dev -client=0.0.0.0 -ui
     networks:
-      - region-a-net
+      - dr-net
     ports:
       - "8500:8500"
 
@@ -19,7 +18,7 @@ services:
     container_name: patroni-a1
     hostname: patroni-a1
     networks:
-      - region-a-net
+      - dr-net
     depends_on:
       - consul-a
     volumes:
@@ -35,7 +34,7 @@ services:
     container_name: patroni-a2
     hostname: patroni-a2
     networks:
-      - region-a-net
+      - dr-net
     depends_on:
       - consul-a
     volumes:

@@ -1,0 +1,5 @@
+networks:
+  dr-net:
+    name: dr-net
+    driver: bridge
+    external: false

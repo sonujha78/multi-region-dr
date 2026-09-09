@@ -1,7 +1,6 @@
 networks:
-  region-b-net:
-    name: region-b-net
-    driver: bridge
+  dr-net:
+    external: true
 
 services:
   consul-b:
@@ -9,7 +8,7 @@ services:
     container_name: consul-b
     command: agent -dev -client=0.0.0.0 -ui
     networks:
-      - region-b-net
+      - dr-net
     ports:
       - "8501:8500"
 
@@ -19,7 +18,7 @@ services:
     container_name: patroni-b1
     hostname: patroni-b1
     networks:
-      - region-b-net
+      - dr-net
     depends_on:
       - consul-b
     volumes:
@@ -35,7 +34,7 @@ services:
     container_name: patroni-b2
     hostname: patroni-b2
     networks:
-      - region-b-net
+      - dr-net
     depends_on:
       - consul-b
     volumes:

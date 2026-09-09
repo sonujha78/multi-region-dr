@@ -8,9 +8,12 @@ RUN apt-get update && \
 RUN mkdir -p /data/patroni && chown -R postgres:postgres /data/patroni
 RUN echo "{}" > /patroni.yml && chown postgres:postgres /patroni.yml
 
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 USER postgres
 WORKDIR /home/postgres
 
 EXPOSE 5432 8008
 
-CMD ["patroni", "/patroni.yml"]
+ENTRYPOINT ["/entrypoint.sh"]
