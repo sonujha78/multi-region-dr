@@ -41,3 +41,32 @@ Region A is considered down when all of: Patroni REST API health check fails on
 both patroni-a1 and patroni-a2, AND consul-a's WAN gossip marks dc-a nodes as
 `failed`, for a sustained period (see automated failover doc for exact timing).
 This dual-signal approach avoids false-positive failover from a single flaky check.
+
+## Failback Procedure (validated)
+
+After Region A recovers from a failure, failback is a **deliberate, planned
+operation** — not automatic. This is intentional: an automatic failback could
+re-promote a region whose underlying failure cause hasn't actually been fixed
+(e.g. flapping network), causing a second outage. The steps below were tested
+and validated:
+
+1. Confirm Region A's Patroni cluster is healthy again (`patronictl list`).
+2. Drop any leftover forward-direction publication/subscription objects.
+3. Create a **reverse** publication on Region B (now the authoritative primary)
+   and a subscription on Region A, so Region A catches up on all writes it
+   missed while it was down.
+4. Once Region A's row count/max(id) matches Region B exactly, Region A is
+   caught up.
+5. To fully failback (Region A becomes primary again): disable the reverse
+   subscription on Region A, then recreate the original forward publication
+   (Region A -> Region B) and subscription, restoring the normal
+   Active-Passive direction. Update HAProxy back to treating Region A as
+   primary, Region B as backup.
+6. Alternative (often preferred operationally): **skip step 5** and simply
+   leave Region B as the new permanent primary, treating Region A as the new
+   standby going forward — avoids a second cutover and its risk window.
+
+This exercise validated steps 1-4 end-to-end: Region A was killed, Region B
+was promoted (see RTO/RPO test), Region A was brought back, reverse-replicated
+from Region B, and confirmed to match exactly (`max(id)=156, count=156` on
+both sides) before the forward direction was restored for repeat testing.
