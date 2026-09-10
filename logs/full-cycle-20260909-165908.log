@@ -1,0 +1,16 @@
+[2026-09-09 16:59:08.331133457] ========== FULL CYCLE TEST RUN 20260909-165908 ==========
+[2026-09-09 16:59:08.739821213] Pre-check: Region A max(id)=156, Region B max(id)=156
+[2026-09-09 16:59:08.747986504] Starting write load (1 insert/0.1s)...
+[2026-09-09 16:59:16.920528877] Region A max(id) just before kill: 156
+[2026-09-09 16:59:16.929424058] >>> Killing Region A (patroni-a1, patroni-a2, consul-a) <<<
+[2026-09-09 16:59:27.278350002] Region A killed at 2026-09-09 16:59:27.267569994
+[2026-09-09 16:59:27.337920071] HAProxy routing confirmed to patroni-b1. RTO = 10.412188873s
+[2026-09-09 16:59:27.485980308] Region B max(id) after failover: 156
+[2026-09-09 16:59:27.494186811] === RESULT: RTO=10.412188873s, RPO=0 row(s) (negative/zero = no loss) ===
+[2026-09-09 16:59:27.505096652] --- Beginning failback ---
+[2026-09-09 16:59:28.511221301] Region A containers restarted. Waiting for Patroni to stabilize...
+[2026-09-09 16:59:44.361095906] Waiting for Region A to catch up from Region B...
+[2026-09-09 17:00:48.670485010] Region A did not catch up via subscription in time; forcing pg_dump/restore fallback.
+[2026-09-09 17:00:49.16630467] Fallback data copy applied.
+[2026-09-09 17:00:55.633004084] Post-failback state: Region A max(id)=156, Region B max(id)=156
+[2026-09-09 17:00:55.641781397] ========== RUN 20260909-165908 COMPLETE (RTO=10.412188873s, RPO=0 rows) ==========

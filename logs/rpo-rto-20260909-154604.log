@@ -1,0 +1,16 @@
+[2026-09-09 15:46:04.875624288] === RPO/RTO TEST RUN 20260909-154604 ===
+[2026-09-09 15:46:04.955200286] Starting row count on Region A: 102
+[2026-09-09 15:46:04.959863251] Beginning continuous write loop (1 insert per 0.1s) until Region A is killed...
+[2026-09-09 15:46:04.967243407] Writer loop started (PID 80896). Letting it run for 10 seconds before kill...
+[2026-09-09 15:46:15.46370096] Row count on Region A immediately before kill: 154
+[2026-09-09 15:46:15.50367240] >>> KILLING REGION A NOW (docker stop patroni-a1 patroni-a2 consul-a) <<<
+[2026-09-09 15:46:25.243644968] Region A killed at 2026-09-09 15:46:25.239803279
+[2026-09-09 15:46:25.248376708] Waiting for automated failover (monitor script) to detect and promote Region B...
+[2026-09-09 15:46:25.253240932] (Watch the monitor-and-failover.sh terminal for live detection/promotion logs)
+[2026-09-09 15:46:25.287261691] Region B (patroni-b1) confirmed UP and routed via HAProxy.
+[2026-09-09 15:46:25.295629994] === RTO (kill to traffic restored): 10.236874716s ===
+[2026-09-09 15:46:25.407447522] Final row count on Region B: 156
+[2026-09-09 15:46:25.414334175] Row count Region A had at kill time: 154
+[2026-09-09 15:46:25.422297624] === RPO: -2 row(s) lost (Region A had 154, Region B has 156) ===
+[2026-09-09 15:46:25.430703843] Rows written by this test's writer loop before kill: 0 (approx, loop was killed)
+[2026-09-09 15:46:25.440338437] === TEST RUN 20260909-154604 COMPLETE. Full log: /home/sonu/multi-region-dr/logs/rpo-rto-20260909-154604.log ===

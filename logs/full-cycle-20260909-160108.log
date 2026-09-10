@@ -1,0 +1,15 @@
+[2026-09-09 16:01:08.587890554] ========== FULL CYCLE TEST RUN 20260909-160108 ==========
+[2026-09-09 16:01:08.751342636] Pre-check: Region A max(id)=156, Region B max(id)=156
+[2026-09-09 16:01:08.758331563] Starting write load (1 insert/0.1s)...
+[2026-09-09 16:01:16.846831946] Region A max(id) just before kill: 156
+[2026-09-09 16:01:16.853763816] >>> Killing Region A (patroni-a1, patroni-a2, consul-a) <<<
+[2026-09-09 16:01:27.40981748] Region A killed at 2026-09-09 16:01:27.35766103
+[2026-09-09 16:01:27.73131476] HAProxy routing confirmed to patroni-b1. RTO = 10.222258137s
+[2026-09-09 16:01:27.169759806] Region B max(id) after failover: 156
+[2026-09-09 16:01:27.176972617] === RESULT: RTO=10.222258137s, RPO=0 row(s) (negative/zero = no loss) ===
+[2026-09-09 16:01:27.183338268] --- Beginning failback ---
+[2026-09-09 16:01:27.801270607] Region A containers restarted. Waiting for Patroni to stabilize...
+[2026-09-09 16:01:43.304687120] Waiting for Region A to catch up from Region B...
+[2026-09-09 16:01:43.400952946] Region A caught up (max(id)=156) after failback sync.
+[2026-09-09 16:01:49.554537111] Post-failback state: Region A max(id)=156, Region B max(id)=156
+[2026-09-09 16:01:49.559779123] ========== RUN 20260909-160108 COMPLETE (RTO=10.222258137s, RPO=0 rows) ==========
